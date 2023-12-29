@@ -22,6 +22,9 @@ public class MainManager : MonoBehaviour
     public static MainManager Instance;
     private int savedPoints;
     public Text BestScoreText;
+
+
+    private string playerName;
     // Start is called before the first frame update
 
     private void Awake()
@@ -37,9 +40,8 @@ public class MainManager : MonoBehaviour
     }
     void Start()
     {
-        Debug.Log(m_Points);
-
-        LoadPoint(m_Points);
+        SetPlayerName();
+        BestScoreText.text = $"Best Score: {playerName} : {savedPoints}";
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
 
@@ -90,37 +92,14 @@ public class MainManager : MonoBehaviour
 
     public void GameOver()
     {
-        SavePoint();
+        MenuManager.Instance.SavePoint(m_Points,playerName);
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
-    [System.Serializable]
-    class SaveData
+   
+
+    public void SetPlayerName()
     {
-        public int _point;
-    }
-
-    public void SavePoint()
-    {
-        SaveData data = new SaveData();
-        data._point = m_Points;
-
-        string json = JsonUtility.ToJson(data);
-
-        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
-    }
-    public void LoadPoint(int point)
-    {
-        string path = Application.persistentDataPath + "/savefile.json";
-        if (File.Exists(path))
-        {
-            string json = File.ReadAllText(path);
-            SaveData data = JsonUtility.FromJson<SaveData>(json);
-
-            savedPoints = data._point;
-            //MainManager.Instance.savedPoints = point;
-            //savedPoints = m_Points;
-            BestScoreText.text = $"Best Score: Name : {savedPoints}";
-        }
+        playerName = MenuManager.Instance.userName.text;
     }
 }
