@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.IO;
 
 public class MainManager : MonoBehaviour
 {
@@ -12,6 +12,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text highScoreText;
     public GameObject GameOverText;
 
     private bool m_Started = false;
@@ -19,29 +20,21 @@ public class MainManager : MonoBehaviour
 
     private bool m_GameOver = false;
 
-    public static MainManager Instance;
-    private int savedPoints;
-    public Text BestScoreText;
-
-
-    private string playerName;
-    // Start is called before the first frame update
-
-    private void Awake()
+    public int GetPoints()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+        return m_Points;
     }
+
+    // Start is called before the first frame update
     void Start()
     {
-        SetPlayerName();
-        BestScoreText.text = $"Best Score: {playerName} : {savedPoints}";
+        if (GameManager.Instance != null && GameManager.Instance.bestPlayerName != null)
+        {
+            highScoreText.text = $"Best score: {GameManager.Instance.bestPlayerName} : {GameManager.Instance.highScore}";
+        }
+
+        ScoreText.text = $"Score: {GameManager.Instance.playerName} : {m_Points}";
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
 
@@ -85,21 +78,18 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
-        Debug.Log(m_Points);
-
+        ScoreText.text = $"Score :{GameManager.Instance.playerName}: {m_Points}";
     }
 
     public void GameOver()
     {
-        MenuManager.Instance.SavePoint(m_Points,playerName);
+        if (m_Points > GameManager.Instance.highScore)
+        {
+            GameManager.Instance.highScore = m_Points;
+            GameManager.Instance.bestPlayerName = GameManager.Instance.playerName;
+            GameManager.Instance.SaveScore();
+        }
         m_GameOver = true;
         GameOverText.SetActive(true);
-    }
-   
-
-    public void SetPlayerName()
-    {
-        playerName = MenuManager.Instance.userName.text;
     }
 }

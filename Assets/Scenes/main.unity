@@ -545,8 +545,8 @@ MonoBehaviour:
   LineCount: 6
   Ball: {fileID: 177912862}
   ScoreText: {fileID: 188020406}
+  highScoreText: {fileID: 2078529056}
   GameOverText: {fileID: 474497238}
-  BestScoreText: {fileID: 2078529056}
 --- !u!1 &455529321
 GameObject:
   m_ObjectHideFlags: 0

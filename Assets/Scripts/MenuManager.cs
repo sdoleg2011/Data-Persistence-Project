@@ -15,7 +15,16 @@ public class MenuManager : MonoBehaviour
 
     private int savedScore;
     private string savedName;
+    public string playerName;
 
+    public string GetPlayerName
+    {
+        get { return playerName; }
+        private set { playerName = value; }
+    }
+
+    public int GetSavedScore { get { return savedScore; } }
+    public string GetSavedName { get { return savedName; } }
 
     private void Awake()
     {
@@ -27,20 +36,15 @@ public class MenuManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-    }
 
-    private void Start()
-    {
-
-        LoadPoint();
-
-        // bestScoreText.text = $"Best Score: {savedName} : {savedScore}";
+        LoadInfo();
     }
 
 
     public void StartGame()
     {
-        userName.text = userInputField.text;
+        SetPlayerName(userInputField.text);
+        //userName.text = userInputField.text;
         SceneManager.LoadScene(1);
     }
 
@@ -56,7 +60,7 @@ public class MenuManager : MonoBehaviour
         public string _name;
     }
 
-    public void SavePoint(int score, string name)
+    public void SaveInfo(int score, string name)
     {
         SaveData data = new SaveData();
         if (data._score < savedScore)
@@ -68,7 +72,7 @@ public class MenuManager : MonoBehaviour
 
         File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
     }
-    public void LoadPoint()
+    public void LoadInfo()
     {
 
         string path = Application.persistentDataPath + "/savefile.json";
@@ -81,8 +85,26 @@ public class MenuManager : MonoBehaviour
             savedScore = data._score;
             savedName = data._name;
 
-
             bestScoreText.text = $"Best Score: {savedName} : {savedScore}";
         }
+    }
+
+    public bool UpdateBestScore(int newScore)
+    {
+        if (savedScore <= newScore)
+        {
+            savedScore = newScore;
+            savedName = userName.text;
+            return true;
+        }
+        return false;
+    }
+    public string ShowInfo()
+    {
+        return $"Best Score: {userName.text} : {savedScore}";
+    }
+    public void SetPlayerName(string newPlayerName)
+    {
+        playerName = newPlayerName;
     }
 }
